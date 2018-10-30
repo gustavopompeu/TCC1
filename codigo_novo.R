@@ -231,12 +231,45 @@ for(i in 1:length(oct_games$PTS)){
   j <- j+1
 }
 
+tste <- a[a$Games_T==5,]
+
 names(a) <- c("Team", "Opp", "Pts_S", "Pts_A", "Home", "Attend", "OT", "Win", "Days_LG", "Games_T", "Games_H",
               "Wins_T", "Wins_H", "Mean_Pts_S_H", "Max_Pts_S_H", "Min_Pts_S_H", "Mean_Pts_S_A", "Max_Pts_S_A", "Min_Pts_S_A",
               "Mean_Pts_S_T", "Mean_Pts_A_H", "Max_Pts_A_H", "Min_Pts_A_H", "Mean_Pts_A_A", "Max_Pts_A_A", "Min_Pts_A_A",
               "Mean_Pts_A_T", "Result")
 
-a[,29] <- Tabela_Comp$Str_Sch
+a[1,29] <- 0
+a[2,29] <- 0
+for(i in 3:length(a$Team)){
+  p <- a[1:(i-1),]$Team == a[i,1]
+  if(sum(p) > 1){
+    c <- which(p)
+    w <- 0
+    g <- 0
+    for(j in 1:length(c)){
+      y <- a[c[j], 2]
+      if(i%%2 == 0){
+        z <- a[1:(i-2),]$Team == y
+      }else{
+        z <- a[1:(i-1),]$Team == y
+      }
+      if(sum(z) > 0){
+        d <- which(z)
+        e <- max(d)
+        w <- w+a[e,12]+(a[e,28]>0)
+        g <- g+a[e,10]+1
+      }
+    }
+    if(g > 0){
+      a[i,29] <- w/g
+    }else{
+      a[i,29] <- 0
+    }
+  }else{
+    a[i,29] <- 0
+  }
+}
+
 names(a)[29] <- "Str_Sch"
 
 b <- data.frame()
