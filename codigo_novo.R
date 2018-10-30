@@ -58,6 +58,30 @@ for(i in 1:length(oct_games$PTS)){
     a[j,25] <- 0
     a[j,26] <- 0
     a[j,27] <- 0
+    a[j,28] <- 0
+    a[j,29] <- 0
+    a[j,30] <- 0
+    a[j,31] <- 0
+    a[j,32] <- 0
+    a[j,33] <- 0
+    a[j,34] <- 0
+    a[j,35] <- 0
+    a[j,36] <- 0
+    a[j,37] <- 0
+    a[j,38] <- 0
+    a[j,39] <- 0
+    a[j,40] <- 0
+    a[j,41] <- 0
+    a[j,42] <- 0
+    a[j,43] <- 0
+    a[j,44] <- 0
+    a[j,45] <- 0
+    a[j,46] <- 0
+    a[j,47] <- 0
+    a[j,48] <- 0
+    a[j,49] <- 0
+    a[j,50] <- 0
+    a[j,51] <- 0
   }else if(a[j,11] == 0){
     a[j,13] <- 0
     a[j,14] <- 0
@@ -77,6 +101,54 @@ for(i in 1:length(oct_games$PTS)){
     a[j,25] <- max(tp7[1:x])
     a[j,26] <- min(tp7[1:x])
     a[j,27] <- round((a[j,21]*a[j,11]+a[j,24]*(a[j,10]-a[j,11]))/a[j,10],2)
+    if((a[j,10]-a[j,11]) > 3){
+      a[j,28] <- round(mean(tail(tp6[1:x],3)),2)
+      a[j,29] <- max(tail(tp6[1:x],3))
+      a[j,30] <- min(tail(tp6[1:x],3))
+    }else{
+      a[j,28] <- 0
+      a[j,29] <- 0
+      a[j,30] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 5){
+      a[j,31] <- round(mean(tail(tp6[1:x],5)),2)
+      a[j,32] <- max(tail(tp6[1:x],5))
+      a[j,33] <- min(tail(tp6[1:x],5))
+    }else{
+      a[j,31] <- 0
+      a[j,32] <- 0
+      a[j,33] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 7){
+      a[j,34] <- round(mean(tail(tp6[1:x],7)),2)
+      a[j,35] <- max(tail(tp6[1:x],7))
+      a[j,36] <- min(tail(tp6[1:x],7))
+    }else{
+      a[j,34] <- 0
+      a[j,35] <- 0
+      a[j,36] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 10){
+      a[j,37] <- round(mean(tail(tp6[1:x],10)),2)
+      a[j,38] <- max(tail(tp6[1:x],10))
+      a[j,39] <- min(tail(tp6[1:x],10))
+    }else{
+      a[j,37] <- 0
+      a[j,38] <- 0
+      a[j,39] <- 0
+    }
+    a[j,40] <- 0
+    a[j,41] <- 0
+    a[j,42] <- 0
+    a[j,43] <- 0
+    a[j,44] <- 0
+    a[j,45] <- 0
+    a[j,46] <- 0
+    a[j,47] <- 0
+    a[j,48] <- 0
+    a[j,49] <- 0
+    a[j,50] <- 0
+    a[j,51] <- 0
   }else if(a[j,10] == a[j,11]){
     tp5 <- a[(a[,1] == a[j,1] & a[,5] == TRUE),8]
     a[j,13] <- sum(tp5)
@@ -97,6 +169,54 @@ for(i in 1:length(oct_games$PTS)){
     a[j,25] <- 0
     a[j,26] <- 0
     a[j,27] <- round((a[j,21]*a[j,11]+a[j,24]*(a[j,10]-a[j,11]))/a[j,10],2)
+    a[j,28] <- 0
+    a[j,29] <- 0
+    a[j,30] <- 0
+    a[j,31] <- 0
+    a[j,32] <- 0
+    a[j,33] <- 0
+    a[j,34] <- 0
+    a[j,35] <- 0
+    a[j,36] <- 0
+    a[j,37] <- 0
+    a[j,38] <- 0
+    a[j,39] <- 0
+    if((a[j,11]) > 3){
+      a[j,40] <- round(mean(tail(tp6[1:x],3)),2)
+      a[j,41] <- max(tail(tp6[1:x],3))
+      a[j,42] <- min(tail(tp6[1:x],3))
+    }else{
+      a[j,40] <- 0
+      a[j,41] <- 0
+      a[j,42] <- 0
+    }
+    if((a[j,11]) > 5){
+      a[j,43] <- round(mean(tail(tp6[1:x],5)),2)
+      a[j,44] <- max(tail(tp6[1:x],5))
+      a[j,45] <- min(tail(tp6[1:x],5))
+    }else{
+      a[j,43] <- 0
+      a[j,44] <- 0
+      a[j,45] <- 0
+    }
+    if((a[j,11]) > 7){
+      a[j,46] <- round(mean(tail(tp6[1:x],7)),2)
+      a[j,47] <- max(tail(tp6[1:x],7))
+      a[j,48] <- min(tail(tp6[1:x],7))
+    }else{
+      a[j,46] <- 0
+      a[j,47] <- 0
+      a[j,48] <- 0
+    }
+    if((a[j,11]) > 10){
+      a[j,49] <- round(mean(tail(tp6[1:x],10)),2)
+      a[j,50] <- max(tail(tp6[1:x],10))
+      a[j,51] <- min(tail(tp6[1:x],10))
+    }else{
+      a[j,49] <- 0
+      a[j,50] <- 0
+      a[j,51] <- 0
+    }
   }else{
     tp5 <- a[(a[,1] == a[j,1] & a[,5] == TRUE),8]
     a[j,13] <- sum(tp5)
@@ -120,8 +240,80 @@ for(i in 1:length(oct_games$PTS)){
     a[j,25] <- max(tp9[1:y])
     a[j,26] <- min(tp9[1:y])
     a[j,27] <- round((a[j,21]*a[j,11]+a[j,24]*(a[j,10]-a[j,11]))/a[j,10],2)
+    if((a[j,10]-a[j,11]) > 3){
+      a[j,28] <- round(mean(tail(tp7[1:y],3)),2)
+      a[j,29] <- max(tail(tp7[1:y],3))
+      a[j,30] <- min(tail(tp7[1:y],3))
+    }else{
+      a[j,28] <- 0
+      a[j,29] <- 0
+      a[j,30] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 5){
+      a[j,31] <- round(mean(tail(tp7[1:y],5)),2)
+      a[j,32] <- max(tail(tp7[1:y],5))
+      a[j,33] <- min(tail(tp7[1:y],5))
+    }else{
+      a[j,31] <- 0
+      a[j,32] <- 0
+      a[j,33] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 7){
+      a[j,34] <- round(mean(tail(tp7[1:y],7)),2)
+      a[j,35] <- max(tail(tp7[1:y],7))
+      a[j,36] <- min(tail(tp7[1:y],7))
+    }else{
+      a[j,34] <- 0
+      a[j,35] <- 0
+      a[j,36] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 10){
+      a[j,37] <- round(mean(tail(tp7[1:y],10)),2)
+      a[j,38] <- max(tail(tp7[1:y],10))
+      a[j,39] <- min(tail(tp7[1:y],10))
+    }else{
+      a[j,37] <- 0
+      a[j,38] <- 0
+      a[j,39] <- 0
+    }
+    if((a[j,11]) > 3){
+      a[j,40] <- round(mean(tail(tp6[1:x],3)),2)
+      a[j,41] <- max(tail(tp6[1:x],3))
+      a[j,42] <- min(tail(tp6[1:x],3))
+    }else{
+      a[j,40] <- 0
+      a[j,41] <- 0
+      a[j,42] <- 0
+    }
+    if((a[j,11]) > 5){
+      a[j,43] <- round(mean(tail(tp6[1:x],5)),2)
+      a[j,44] <- max(tail(tp6[1:x],5))
+      a[j,45] <- min(tail(tp6[1:x],5))
+    }else{
+      a[j,43] <- 0
+      a[j,44] <- 0
+      a[j,45] <- 0
+    }
+    if((a[j,11]) > 7){
+      a[j,46] <- round(mean(tail(tp6[1:x],7)),2)
+      a[j,47] <- max(tail(tp6[1:x],7))
+      a[j,48] <- min(tail(tp6[1:x],7))
+    }else{
+      a[j,46] <- 0
+      a[j,47] <- 0
+      a[j,48] <- 0
+    }
+    if((a[j,11]) > 10){
+      a[j,49] <- round(mean(tail(tp6[1:x],10)),2)
+      a[j,50] <- max(tail(tp6[1:x],10))
+      a[j,51] <- min(tail(tp6[1:x],10))
+    }else{
+      a[j,49] <- 0
+      a[j,50] <- 0
+      a[j,51] <- 0
+    }
   }
-  a[j,28] <- result
+  a[j,52] <- result
   
   j <- j+1
   
@@ -168,6 +360,30 @@ for(i in 1:length(oct_games$PTS)){
     a[j,25] <- 0
     a[j,26] <- 0
     a[j,27] <- 0
+    a[j,28] <- 0
+    a[j,29] <- 0
+    a[j,30] <- 0
+    a[j,31] <- 0
+    a[j,32] <- 0
+    a[j,33] <- 0
+    a[j,34] <- 0
+    a[j,35] <- 0
+    a[j,36] <- 0
+    a[j,37] <- 0
+    a[j,38] <- 0
+    a[j,39] <- 0
+    a[j,40] <- 0
+    a[j,41] <- 0
+    a[j,42] <- 0
+    a[j,43] <- 0
+    a[j,44] <- 0
+    a[j,45] <- 0
+    a[j,46] <- 0
+    a[j,47] <- 0
+    a[j,48] <- 0
+    a[j,49] <- 0
+    a[j,50] <- 0
+    a[j,51] <- 0
   }else if(a[j,11] == 0){
     a[j,14] <- 0
     a[j,15] <- 0
@@ -186,6 +402,54 @@ for(i in 1:length(oct_games$PTS)){
     a[j,25] <- max(tp7[1:x])
     a[j,26] <- min(tp7[1:x])
     a[j,27] <- round((a[j,21]*a[j,11]+a[j,24]*(a[j,10]-a[j,11]))/a[j,10],2)
+    if((a[j,10]-a[j,11]) > 3){
+      a[j,28] <- round(mean(tail(tp6[1:x],3)),2)
+      a[j,29] <- max(tail(tp6[1:x],3))
+      a[j,30] <- min(tail(tp6[1:x],3))
+    }else{
+      a[j,28] <- 0
+      a[j,29] <- 0
+      a[j,30] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 5){
+      a[j,31] <- round(mean(tail(tp6[1:x],5)),2)
+      a[j,32] <- max(tail(tp6[1:x],5))
+      a[j,33] <- min(tail(tp6[1:x],5))
+    }else{
+      a[j,31] <- 0
+      a[j,32] <- 0
+      a[j,33] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 7){
+      a[j,34] <- round(mean(tail(tp6[1:x],7)),2)
+      a[j,35] <- max(tail(tp6[1:x],7))
+      a[j,36] <- min(tail(tp6[1:x],7))
+    }else{
+      a[j,34] <- 0
+      a[j,35] <- 0
+      a[j,36] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 10){
+      a[j,37] <- round(mean(tail(tp6[1:x],10)),2)
+      a[j,38] <- max(tail(tp6[1:x],10))
+      a[j,39] <- min(tail(tp6[1:x],10))
+    }else{
+      a[j,37] <- 0
+      a[j,38] <- 0
+      a[j,39] <- 0
+    }
+    a[j,40] <- 0
+    a[j,41] <- 0
+    a[j,42] <- 0
+    a[j,43] <- 0
+    a[j,44] <- 0
+    a[j,45] <- 0
+    a[j,46] <- 0
+    a[j,47] <- 0
+    a[j,48] <- 0
+    a[j,49] <- 0
+    a[j,50] <- 0
+    a[j,51] <- 0
   }else if(a[j,10] == a[j,11]){
     x <- a[j,11]
     tp6 <- a[(a[,1] == a[j,1] & a[,5] == TRUE), 3]
@@ -204,6 +468,54 @@ for(i in 1:length(oct_games$PTS)){
     a[j,25] <- 0
     a[j,26] <- 0
     a[j,27] <- round((a[j,21]*a[j,11]+a[j,24]*(a[j,10]-a[j,11]))/a[j,10],2)
+    a[j,28] <- 0
+    a[j,29] <- 0
+    a[j,30] <- 0
+    a[j,31] <- 0
+    a[j,32] <- 0
+    a[j,33] <- 0
+    a[j,34] <- 0
+    a[j,35] <- 0
+    a[j,36] <- 0
+    a[j,37] <- 0
+    a[j,38] <- 0
+    a[j,39] <- 0
+    if((a[j,11]) > 3){
+      a[j,40] <- round(mean(tail(tp6[1:x],3)),2)
+      a[j,41] <- max(tail(tp6[1:x],3))
+      a[j,42] <- min(tail(tp6[1:x],3))
+    }else{
+      a[j,40] <- 0
+      a[j,41] <- 0
+      a[j,42] <- 0
+    }
+    if((a[j,11]) > 5){
+      a[j,43] <- round(mean(tail(tp6[1:x],5)),2)
+      a[j,44] <- max(tail(tp6[1:x],5))
+      a[j,45] <- min(tail(tp6[1:x],5))
+    }else{
+      a[j,43] <- 0
+      a[j,44] <- 0
+      a[j,45] <- 0
+    }
+    if((a[j,11]) > 7){
+      a[j,46] <- round(mean(tail(tp6[1:x],7)),2)
+      a[j,47] <- max(tail(tp6[1:x],7))
+      a[j,48] <- min(tail(tp6[1:x],7))
+    }else{
+      a[j,46] <- 0
+      a[j,47] <- 0
+      a[j,48] <- 0
+    }
+    if((a[j,11]) > 10){
+      a[j,49] <- round(mean(tail(tp6[1:x],10)),2)
+      a[j,50] <- max(tail(tp6[1:x],10))
+      a[j,51] <- min(tail(tp6[1:x],10))
+    }else{
+      a[j,49] <- 0
+      a[j,50] <- 0
+      a[j,51] <- 0
+    }
   }else{
     x <- a[j,11]
     tp6 <- a[(a[,1] == a[j,1] & a[,5] == TRUE), 3]
@@ -225,18 +537,91 @@ for(i in 1:length(oct_games$PTS)){
     a[j,25] <- max(tp9[1:y])
     a[j,26] <- min(tp9[1:y])
     a[j,27] <- round((a[j,21]*a[j,11]+a[j,24]*(a[j,10]-a[j,11]))/a[j,10],2)
+    if((a[j,10]-a[j,11]) > 3){
+      a[j,28] <- round(mean(tail(tp7[1:y],3)),2)
+      a[j,29] <- max(tail(tp7[1:y],3))
+      a[j,30] <- min(tail(tp7[1:y],3))
+    }else{
+      a[j,28] <- 0
+      a[j,29] <- 0
+      a[j,30] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 5){
+      a[j,31] <- round(mean(tail(tp7[1:y],5)),2)
+      a[j,32] <- max(tail(tp7[1:y],5))
+      a[j,33] <- min(tail(tp7[1:y],5))
+    }else{
+      a[j,31] <- 0
+      a[j,32] <- 0
+      a[j,33] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 7){
+      a[j,34] <- round(mean(tail(tp7[1:y],7)),2)
+      a[j,35] <- max(tail(tp7[1:y],7))
+      a[j,36] <- min(tail(tp7[1:y],7))
+    }else{
+      a[j,34] <- 0
+      a[j,35] <- 0
+      a[j,36] <- 0
+    }
+    if((a[j,10]-a[j,11]) > 10){
+      a[j,37] <- round(mean(tail(tp7[1:y],10)),2)
+      a[j,38] <- max(tail(tp7[1:y],10))
+      a[j,39] <- min(tail(tp7[1:y],10))
+    }else{
+      a[j,37] <- 0
+      a[j,38] <- 0
+      a[j,39] <- 0
+    }
+    if((a[j,11]) > 3){
+      a[j,40] <- round(mean(tail(tp6[1:x],3)),2)
+      a[j,41] <- max(tail(tp6[1:x],3))
+      a[j,42] <- min(tail(tp6[1:x],3))
+    }else{
+      a[j,40] <- 0
+      a[j,41] <- 0
+      a[j,42] <- 0
+    }
+    if((a[j,11]) > 5){
+      a[j,43] <- round(mean(tail(tp6[1:x],5)),2)
+      a[j,44] <- max(tail(tp6[1:x],5))
+      a[j,45] <- min(tail(tp6[1:x],5))
+    }else{
+      a[j,43] <- 0
+      a[j,44] <- 0
+      a[j,45] <- 0
+    }
+    if((a[j,11]) > 7){
+      a[j,46] <- round(mean(tail(tp6[1:x],7)),2)
+      a[j,47] <- max(tail(tp6[1:x],7))
+      a[j,48] <- min(tail(tp6[1:x],7))
+    }else{
+      a[j,46] <- 0
+      a[j,47] <- 0
+      a[j,48] <- 0
+    }
+    if((a[j,11]) > 10){
+      a[j,49] <- round(mean(tail(tp6[1:x],10)),2)
+      a[j,50] <- max(tail(tp6[1:x],10))
+      a[j,51] <- min(tail(tp6[1:x],10))
+    }else{
+      a[j,49] <- 0
+      a[j,50] <- 0
+      a[j,51] <- 0
+    }
   }
-  a[j,28] <- -result
+  a[j,52] <- -result
   
   j <- j+1
 }
 
-tste <- a[a$Games_T==5,]
-
 names(a) <- c("Team", "Opp", "Pts_S", "Pts_A", "Home", "Attend", "OT", "Win", "Days_LG", "Games_T", "Games_H",
               "Wins_T", "Wins_H", "Mean_Pts_S_H", "Max_Pts_S_H", "Min_Pts_S_H", "Mean_Pts_S_A", "Max_Pts_S_A", "Min_Pts_S_A",
               "Mean_Pts_S_T", "Mean_Pts_A_H", "Max_Pts_A_H", "Min_Pts_A_H", "Mean_Pts_A_A", "Max_Pts_A_A", "Min_Pts_A_A",
-              "Mean_Pts_A_T", "Result")
+              "Mean_Pts_A_T", "Mean_Last3_away", "Max_Last3_away", "Min_Last3away", "Mean_Last5_away", "Max_Last5_away", "Min_Last5away",
+              "Mean_Last7_away", "Max_Last7_away", "Min_Last7away","Mean_Last10_away", "Max_Last10_away", "Min_Last10away",
+              "Mean_Last3_home", "Max_Last3_home", "Min_Last3home", "Mean_Last5_home", "Max_Last5_home", "Min_Last5home",
+              "Mean_Last7_home", "Max_Last7_home", "Min_Last7home","Mean_Last10_home", "Max_Last10_home", "Min_Last10home","result")
 
 a[1,29] <- 0
 a[2,29] <- 0

@@ -22,7 +22,11 @@ ler_jogos <- function(url){
 }
 
 tabela_temporada <- function(year){
-  months <- c("october","november","december","january","february","march","april","may","june")
+  if(year == 2019){
+    months <- c("october","november","december","january","february","march","april")
+  }else{
+    months <- c("october","november","december","january","february","march","april","may","june")
+  }
   cola1 <- paste("https://www.basketball-reference.com/leagues/NBA_",year,sep="")
   cola2 <- paste(cola1,"_games-",months,sep="")
   url <- paste(cola2,".html",sep="")
@@ -46,3 +50,4 @@ jogos_2015 <- tabela_temporada(2015)
 jogos_2016 <- tabela_temporada(2016)
 jogos_2017 <- tabela_temporada(2017)
 jogos_2018 <- tabela_temporada(2018)
+jogos_2019 <- tabela_temporada(2019)
