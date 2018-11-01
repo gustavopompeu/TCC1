@@ -41,6 +41,7 @@ tabela_temporada <- function(year){
   teste$Attend <- as.numeric(gsub(",", "", teste$Attend))
   Sys.setlocale("LC_ALL","English")
   teste$Date <- as.Date(teste$Date, format="%a, %b %d, %Y")
+  teste$OT[teste$OT == ""] <- NA
   return(teste)
 }
 
