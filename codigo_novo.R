@@ -1,16 +1,65 @@
-##Arrumando a base com os jogos
+##Leitura dos dados da internet
 
-library(readxl)
-oct_games <- read_excel("C:/Gustavo/Trabalhos/UnB/TCC/oct_games.xlsx")
-oct_games <- as.data.frame(oct_games)
-attach(oct_games)
-oct_games$Attend <- as.numeric(gsub(",", "", Attend))
-Sys.setlocale("LC_ALL","English")
-oct_games$Date <- as.Date(Date, format="%a, %b %d, %Y")
+library(rvest)
 
-str(oct_games)
+ler_jogos <- function(url){
+  html <- read_html(url)
+  games <- html_nodes(html, ".center+ .center , .left:nth-child(5) , td+ .right , .left:nth-child(3) , .poptip.right , .left:nth-child(1)")
+  texto <- html_text(games)
+  tabela <- data.frame()
+  j <- 1
+  for(i in 1:(length(texto)/7)){
+    tabela[i,1] <- texto[j]
+    tabela[i,2] <- texto[j+1]
+    tabela[i,3] <- texto[j+2]
+    tabela[i,4] <- texto[j+3]
+    tabela[i,5] <- texto[j+4]
+    tabela[i,6] <- texto[j+5]
+    tabela[i,7] <- texto[j+6]
+    j <- j+7
+  }
+  names(tabela) <- tabela[1,]
+  tabela <- tabela[2:length(tabela[,1]),]
+  return(tabela)
+}
+
+tabela_temporada <- function(year){
+  if(year == 2019){
+    months <- c("october","november","december","january","february","march","april")
+  }else{
+    months <- c("october","november","december","january","february","march","april","may","june")
+  }
+  cola1 <- paste("https://www.basketball-reference.com/leagues/NBA_",year,sep="")
+  cola2 <- paste(cola1,"_games-",months,sep="")
+  url <- paste(cola2,".html",sep="")
+  teste <- data.frame()
+  for(i in 1:length(url)){
+    b <- ler_jogos(url[i])
+    teste <- rbind(teste,b)
+  }
+  names(teste) <- c("Date", "Visitor", "PTS_Visitor", "Home", "PTS_Home", "OT", "Attend")
+  teste$PTS_Visitor <- as.numeric(teste$PTS_Visitor)
+  teste$PTS_Home <- as.numeric(teste$PTS_Home)
+  teste$Attend <- as.numeric(gsub(",", "", teste$Attend))
+  Sys.setlocale("LC_ALL","English")
+  teste$Date <- as.Date(teste$Date, format="%a, %b %d, %Y")
+  teste$OT[teste$OT == ""] <- NA
+  return(teste)
+}
+
+#bases das temporadas anteriores, ja estao salvas
+jogos_2013 <- tabela_temporada(2013)
+jogos_2014 <- tabela_temporada(2014)
+jogos_2015 <- tabela_temporada(2015)
+jogos_2016 <- tabela_temporada(2016)
+jogos_2017 <- tabela_temporada(2017)
+jogos_2018 <- tabela_temporada(2018)
+
+##Temporada atual, unica q precisa rodar novamente
+jogos_2019 <- tabela_temporada(2019)
 
 ##Criando base com dados
+## precisa arrumar a variavel OT
 
 base_var <- function(oct_games){
 a <- data.frame()
@@ -1347,6 +1396,7 @@ names(a)[101] <- "Str_Sch"
 return(a)
 }
 
+# salva as bases
 base2013 <- base_var(jogos_2013)
 write.csv(base2013,"C:/Gustavo/Trabalhos/UnB/TCC/LATEX/tcc_git/base2013.csv")
 base2014 <- base_var(jogos_2014)
@@ -1361,28 +1411,133 @@ base2018 <- base_var(jogos_2018)
 write.csv(base2018,"C:/Gustavo/Trabalhos/UnB/TCC/LATEX/tcc_git/base2018.csv")
 
 
-b <- data.frame()
-for(i in seq(1,2460,by=2)){
-  d <- cbind(a[i,],a[i+1,])
-  b <- rbind(b,d)
+################# testes
+
+
+database <- read.csv("C:/Gustavo/Trabalhos/UnB/TCC/LATEX/tcc_git/base2018.csv")
+regular <- database[1:2460,]
+data2 <- read.csv("C:/Gustavo/Trabalhos/UnB/TCC/LATEX/tcc_git/base2017.csv")
+regular2 <- data2[1:2460,]
+
+junto <- function(a){
+  b <- data.frame()
+  for(i in seq(1,length(a[,1]),by=2)){
+    d <- cbind(a[i,],a[i+1,])
+    b <- rbind(b,d)
+  }
+  return(b)
 }
 
-names(b) <- c("Team", "Opp", "Pts_S", "Pts_A", "Home", "Attend", "OT", "Win", "Days_LG", "Games_T", "Games_H",
-              "Wins_T", "Wins_H", "Mean_Pts_S_H", "Max_Pts_S_H", "Min_Pts_S_H", "Mean_Pts_S_A", "Max_Pts_S_A", "Min_Pts_S_A",
-              "Mean_Pts_S_T", "Mean_Pts_A_H", "Max_Pts_A_H", "Min_Pts_A_H", "Mean_Pts_A_A", "Max_Pts_A_A", "Min_Pts_A_A",
-              "Mean_Pts_A_T", "Result", "Str_Sch", "Team_O", "Opp_O", "Pts_S_O", "Pts_A_O", "Home_O", "Attend_O", "OT_O", "Win_O", "Days_LG_O", "Games_T_O", "Games_H_O",
-              "Wins_T_O", "Wins_H_O", "Mean_Pts_S_H_O", "Max_Pts_S_H_O", "Min_Pts_S_H_O", "Mean_Pts_S_A_O", "Max_Pts_S_A_O", "Min_Pts_S_A_O",
-              "Mean_Pts_S_T_O", "Mean_Pts_A_H_O", "Max_Pts_A_H_O", "Min_Pts_A_H_O", "Mean_Pts_A_A_O", "Max_Pts_A_A_O", "Min_Pts_A_A_O",
-              "Mean_Pts_A_T_O", "Result_O", "Str_Sch_O")
+dados <- junto(regular)
+dados <- dados[,-c(1:8,15,16,17,22,23,24,41:52,77:88,103:108,110,111,120,121,122,127,128,129,
+                   131:142,167:178)]
+
+dados2 <- junto(regular2)
+dados2 <- dados2[,-c(1:8,15,16,17,22,23,24,41:52,77:88,103:108,110,111,120,121,122,127,128,129,
+                   131:142,167:178)]
+
+a <- dados[,-c(1,63)] > 0
+af <- dados[,-c(1,127)] > 0
+a2 <- dados2[,-c(1,63)] > 0
+a2f <- dados2[,-c(1,127)] > 0
+
+x <- rowSums(a)
+xf <- rowSums(af)
+x2 <- rowSums(a2)
+x2f <- rowSums(a2f)
+
+tes <- dados[which(x == 126),]
+tesf <- dados[which(xf == 126),]
+tes2 <- dados2[which(x2 == 126),]
+tes2f <- dados2[which(x2f == 126),]
 
 
-teste <- lm(Result_O~., data=b[56:1000,c(9,12,13,17,20,24,27,29,35,38,41,42,43,49,50,56,57,58)])
-summary(teste)
-
-win <- (predict(teste, newdata=b[1001:1230,c(9,12,13,17,20,24,27,29,35,38,41,42,43,49,50,56,58)]) > 0) == b$Win_O[1001:1230]
+require(leaps)
+teste <- lm(result.1~., data=tes[,-c(1,63)])
+win <- (predict(teste, newdata=tes2[,-c(1,63)]) < 0) == tes2$Win
 mean(win)
 
-plot(teste)
+testef <- lm(result~., data=tesf[,-c(1,127)])
+win <- (predict(testef, newdata=tes2f[,-c(1,127)]) > 0) == tes2f$Win
+mean(win)
+
+step(teste, direction='backward', scope=( ~ 1))
+
+modmin<-lm(result ~ 1, data=tes[,2:127])
+step(modmin, direction='forward', scope=( ~ Days_LG + Games_T + Games_H + Wins_T + Wins_H + Mean_Pts_S_A + 
+                                            Max_Pts_S_A + Min_Pts_S_A + Mean_Pts_S_T + Mean_Pts_A_A + 
+                                            Max_Pts_A_A + Min_Pts_A_A + Mean_Pts_A_T + Mean_Last3_away + 
+                                            Max_Last3_away + Min_Last3away + Mean_Last5_away + Max_Last5_away + 
+                                            Min_Last5away + Mean_Last7_away + Max_Last7_away + Min_Last7away + 
+                                            Mean_Last10_away + Max_Last10_away + Min_Last10away + Mean_Last3_total + 
+                                            Max_Last3_total + Min_Last3total + Mean_Last5_total + Max_Last5_total + 
+                                            Min_Last5total + Mean_Last7_total + Max_Last7_total + Min_Last7total + 
+                                            Mean_Last10_total + Max_Last10_total + Min_Last10total + 
+                                            Mean_Last3_away_opp + Max_Last3_away_opp + Min_Last3away_opp + 
+                                            Mean_Last5_away_opp + Max_Last5_away_opp + Min_Last5away_opp + 
+                                            Mean_Last7_away_opp + Max_Last7_away_opp + Min_Last7away_opp + 
+                                            Mean_Last10_away_opp + Max_Last10_away_opp + Min_Last10away_opp + 
+                                            Mean_Last3_total_opp + Max_Last3_total_opp + Min_Last3total_opp + 
+                                            Mean_Last5_total_opp + Max_Last5_total_opp + Min_Last5total_opp + 
+                                            Mean_Last7_total_opp + Max_Last7_total_opp + Min_Last7total_opp + 
+                                            Mean_Last10_total_opp + Max_Last10_total_opp + Min_Last10total_opp + 
+                                            Str_Sch + Attend + Days_LG.1 + Games_T.1 + Games_H.1 + Wins_T.1 + 
+                                            Wins_H.1 + Mean_Pts_S_H + Max_Pts_S_H + Min_Pts_S_H + Mean_Pts_S_T.1 + 
+                                            Mean_Pts_A_H + Max_Pts_A_H + Min_Pts_A_H + Mean_Pts_A_T.1 + 
+                                            Mean_Last3_home + Max_Last3_home + Min_Last3home + Mean_Last5_home + 
+                                            Max_Last5_home + Min_Last5home + Mean_Last7_home + Max_Last7_home + 
+                                            Min_Last7home + Mean_Last10_home + Max_Last10_home + Min_Last10home + 
+                                            Mean_Last3_total.1 + Max_Last3_total.1 + Min_Last3total.1 + 
+                                            Mean_Last5_total.1 + Max_Last5_total.1 + Min_Last5total.1 + 
+                                            Mean_Last7_total.1 + Max_Last7_total.1 + Min_Last7total.1 + 
+                                            Mean_Last10_total.1 + Max_Last10_total.1 + Min_Last10total.1 + 
+                                            Mean_Last3_home_opp + Max_Last3_home_opp + Min_Last3home_opp + 
+                                            Mean_Last5_home_opp + Max_Last5_home_opp + Min_Last5home_opp + 
+                                            Mean_Last7_home_opp + Max_Last7_home_opp + Min_Last7home_opp + 
+                                            Mean_Last10_home_opp + Max_Last10_home_opp + Min_Last10home_opp + 
+                                            Mean_Last3_total_opp.1 + Max_Last3_total_opp.1 + Min_Last3total_opp.1 + 
+                                            Mean_Last5_total_opp.1 + Max_Last5_total_opp.1 + Min_Last5total_opp.1 + 
+                                            Mean_Last7_total_opp.1 + Max_Last7_total_opp.1 + Min_Last7total_opp.1 + 
+                                            Mean_Last10_total_opp.1 + Max_Last10_total_opp.1 + Min_Last10total_opp.1 + 
+                                            Str_Sch.1))
+
+
+
+teste2 <- lm(formula = result ~ Games_T + Wins_T + Mean_Pts_S_A + Mean_Pts_S_T + 
+               Min_Pts_A_A + Mean_Last5_away + Max_Last10_away + Min_Last5total + 
+               Mean_Last3_away_opp + Min_Last3away_opp + Mean_Last5_away_opp + 
+               Mean_Last7_away_opp + Min_Last7away_opp + Min_Last10away_opp + 
+               Mean_Last3_total_opp + Min_Last3total_opp + Max_Last7_total_opp + 
+               Min_Last10total_opp + Games_T.1 + Wins_T.1 + Min_Pts_S_H + 
+               Min_Pts_A_H + Mean_Pts_A_T.1 + Max_Last3_home + Min_Last5home + 
+               Max_Last7_home + Mean_Last10_home + Max_Last10_home + Min_Last3total.1 + 
+               Min_Last7total.1 + Max_Last5_home_opp + Min_Last5home_opp + 
+               Mean_Last7_home_opp + Max_Last7_home_opp + Max_Last3_total_opp.1 + 
+               Min_Last7total_opp.1 + Mean_Last10_total_opp.1 + Min_Last10total_opp.1 + 
+               Str_Sch.1, data = tes[, 2:127])
+summary(teste2)
+
+win2 <- (predict(teste2, newdata=tes2[,2:127]) > 0) == tes2$Win
+mean(win2)
+
+teste3 <- lm(formula = result ~ Wins_T.1 + Wins_T + Min_Pts_A_H + Min_Last3home + 
+               Max_Last5_away + Max_Last3_total_opp.1 + Min_Pts_S_H + Min_Last3away_opp + 
+               Min_Last10away_opp + Mean_Last7_away_opp + Mean_Last3_away_opp + 
+               Mean_Pts_A_T.1 + Mean_Last10_total + Min_Last3total + Min_Last7total_opp.1 + 
+               Max_Pts_S_H + Min_Last7away_opp + Min_Last5away_opp, data = tes[, 
+                                                                               2:127])
+summary(teste3)
+
+win3 <- (predict(teste3, newdata=tes2[,2:127]) > 0) == tes2$Win
+mean(win3)
+
+
+teste4 <- lm(result~., data=dados[100:1000,2:127])
+summary(teste4)
+
+win4 <- (predict(teste4, newdata=dados[1001:1230,2:127]) > 0) == dados$Win[1001:1230]
+mean(win4)
+
 
 library(e1071)
 teste1 <- svm(Result_O~., data=b[56:1000,c(9,12,13,17,20,24,27,29,35,38,41,42,43,49,50,56,57,58)])
