@@ -29,9 +29,18 @@ final2018$temporadas <- 17
 final2019$temporadas <- 18
 #####
 
-#base full
-final <- rbind(final2013[1:1230,],final2014[1:1230,],final2015[1:1230,],final2016[1:1230,],
-               final2017[1:1230,],final2018[1:1230,])
+final <- data.frame()
+for(i in 2001:2018){
+  assign("base",get(paste("final",i,sep="")))
+  if(i == 2001 | i == 2002 | i == 2003 | i == 2004){
+    final <- rbind(final,base[1:1189,])
+  }else if(i == 2012){
+    final <- rbind(final,base[1:990,])
+  }else{
+    final <- rbind(final,base[1:1230,])
+  }
+}
+
 #1 win
 #2 result
 
@@ -39,7 +48,7 @@ final <- rbind(final2013[1:1230,],final2014[1:1230,],final2015[1:1230,],final201
 final <- final[,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
 
 #encontrando os padroes
-teste19 <- final2019[1:872,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
+teste19 <- final2019[1:1230,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
 padrao19 <- is.na(teste19[,-c(1,2)])
 
 for(i in 1:length(teste19$Win)){
@@ -53,7 +62,8 @@ nomes <- names(summary(as.factor(oi19)))
 
 vet <- c()
 for(i in 1:length(nomes)){
-  full19 <- oi19==nomes[1]
+  if(i!=1){
+  full19 <- oi19==nomes[i]
   td19 <- teste19[full19,]
   colun <- !is.na(td19[1,])
   td19 <- td19[,colun]
@@ -62,41 +72,116 @@ for(i in 1:length(nomes)){
   mod <- lm(result~., data=td[,-1])
   win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result > 0)
   vet <- c(vet,win)
+  }
 }
 
 vet2 <- c()
 for(i in 1:length(nomes)){
   library(dplyr)
+  if(i!=1){
   full19 <- oi19==nomes[i]
   td19 <- teste19[full19,]
   colun <- !is.na(td19[1,])
   td19 <- td19[,colun]
-  td <- final[,colun]
+  td <- final[14357:21736,colun]
   td <- td[rowSums(is.na(td)) == 0,]
-  a <- glm(Win~., data = td[,-2], family=binomial(link = "logit"))
-  library(dplyr)
+  a <- glm(Win~., data = td[,-2], family=binomial(link = "probit"))
   probabilities <- a %>% predict(td19[,-2], type = "response")
   predicted.classes <- ifelse(probabilities > 0.5, "TRUE", "FALSE")
   win <- predicted.classes == td19$Win
   vet2 <- c(vet2,win)
+  }
 }
+
+mean(vet2)
 
 vet3 <- c()
 for(i in 1:length(nomes)){
   library(e1071)
+  if(i!=1){
   full19 <- oi19==nomes[i]
   td19 <- teste19[full19,]
   colun <- !is.na(td19[1,])
   td19 <- td19[,colun]
   td <- final[,colun]
   td <- td[rowSums(is.na(td)) == 0,]
-  mod <- svm(result~., data=td[,-1])
+  mod <- svm(result~., data=td[,-1], cost=8, gamma=10^-4)
   win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result > 0)
   vet3 <- c(vet3,win)
+  }
 }
 
-mean(vet3)
-mean(teste19$Win)
+vet4 <- c()
+for(i in 1:length(nomes)){
+  if(i!=1){
+  library(MASS)
+  full19 <- oi19==nomes[i]
+  td19 <- teste19[full19,]
+  colun <- !is.na(td19[1,])
+  td19 <- td19[,colun]
+  td <- final[,colun]
+  td <- td[rowSums(is.na(td)) == 0,]
+  mod <- lda(Win~., data=td[,-2])
+  prd <- predict(mod, newdata=td19[,-2])
+  win <- as.logical(prd$class) == td19$Win
+  vet4 <- c(vet4,win)
+  }
+}
+
+mean(vet4)
+
+vet5 <- c()
+for(i in 1:length(nomes)){
+  library(randomForest)
+  if(i==1){
+    full19 <- oi19==nomes[i]
+    td19 <- teste19[full19,]
+    colun <- !is.na(td19[1,])
+    td19 <- td19[,colun]
+    td <- final[,colun]
+    td <- td[rowSums(is.na(td)) == 0,]
+    mod <- randomForest(result~., data=td[,-1])
+    win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result > 0)
+    vet5 <- c(vet5,win)
+  }
+}
+
+vet6 <- c()
+for(i in 1:length(nomes)){
+  library(tree)
+  if(i!=1){
+    full19 <- oi19==nomes[i]
+    td19 <- teste19[full19,]
+    colun <- !is.na(td19[1,])
+    td19 <- td19[,colun]
+    td <- final[,colun]
+    td <- td[rowSums(is.na(td)) == 0,]
+    mod <- tree(result~., data=td[,-1])
+    win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result > 0)
+    vet6 <- c(vet6,win)
+  }
+}
+
+
+vet7 <- c()
+for(i in 1:length(nomes)){
+  library(tree)
+  if(i!=1){
+    full19 <- oi19==nomes[i]
+    td19 <- teste19[full19,]
+    colun <- !is.na(td19[1,])
+    td19 <- td19[,colun]
+    td <- final[,colun]
+    td <- td[rowSums(is.na(td)) == 0,]
+    mod <- tree(Win~., data=td[,-2])
+    probabilities <- predict(mod, newdata=td19[,-2])
+    predicted.classes <- ifelse(probabilities > 0.5, "TRUE", "FALSE")
+    win <- predicted.classes == td19$Win
+    vet7 <- c(vet7,win)
+  }
+}
+
+mean(vet7)
 
 #######REG LINEAR
 mod <- lm(result~., data=td[,-1])
@@ -109,53 +194,16 @@ require(leaps)
 #com o primeiro (com menos variaveis)
 step(mod, direction='backward', scope=( ~ 1))
 modmin <- lm(result ~ 1, data=td[,-1])
-step(modmin, direction='forward', scope=(~ Days_LG + Wins_T + Wins_A + Loss_T + Loss_A + Streak_T + 
-                                           Streak_A + OT_last + Str_Sch + Mean_Pts_S_A + Max_Pts_S_A + 
-                                           Min_Pts_S_A + Mean_Pts_S_T + Mean_Pts_A_A + Max_Pts_A_A + 
-                                           Min_Pts_A_A + Mean_Pts_A_T + Mean_Last3_away + Max_Last3_away + 
-                                           Min_Last3away + Mean_Last5_away + Max_Last5_away + Min_Last5away + 
-                                           Mean_Last7_away + Max_Last7_away + Min_Last7away + Mean_Last10_away + 
-                                           Max_Last10_away + Min_Last10away + Mean_Last3_total + Max_Last3_total + 
-                                           Min_Last3total + Mean_Last5_total + Max_Last5_total + Min_Last5total + 
-                                           Mean_Last7_total + Max_Last7_total + Min_Last7total + Mean_Last10_total + 
-                                           Max_Last10_total + Min_Last10total + Mean_Last3_away_opp + 
-                                           Max_Last3_away_opp + Min_Last3away_opp + Mean_Last5_away_opp + 
-                                           Max_Last5_away_opp + Min_Last5away_opp + Mean_Last7_away_opp + 
-                                           Max_Last7_away_opp + Min_Last7away_opp + Mean_Last10_away_opp + 
-                                           Max_Last10_away_opp + Min_Last10away_opp + Mean_Last3_total_opp + 
-                                           Max_Last3_total_opp + Min_Last3total_opp + Mean_Last5_total_opp + 
-                                           Max_Last5_total_opp + Min_Last5total_opp + Mean_Last7_total_opp + 
-                                           Max_Last7_total_opp + Min_Last7total_opp + Mean_Last10_total_opp + 
-                                           Max_Last10_total_opp + Min_Last10total_opp + Win_Last3_away + 
-                                           Win_Last5_away + Win_Last7_away + Win_Last10_away + Win_Last3_total + 
-                                           Win_Last5_total + Win_Last7_total + Win_Last10_total + Days_LG.1 + 
-                                           Wins_T.1 + Wins_H.1 + Loss_T.1 + Loss_H.1 + Streak_T.1 + 
-                                           Streak_H.1 + OT_last.1 + weekday + mean_attend + Travel.1 + 
-                                           Str_Sch.1 + Mean_Pts_S_H.1 + Max_Pts_S_H.1 + Min_Pts_S_H.1 + 
-                                           Mean_Pts_S_T.1 + Mean_Pts_A_H.1 + Max_Pts_A_H.1 + Min_Pts_A_H.1 + 
-                                           Mean_Pts_A_T.1 + Mean_Last3_home.1 + Max_Last3_home.1 + Min_Last3home.1 + 
-                                           Mean_Last5_home.1 + Max_Last5_home.1 + Min_Last5home.1 + 
-                                           Mean_Last7_home.1 + Max_Last7_home.1 + Min_Last7home.1 + 
-                                           Mean_Last10_home.1 + Max_Last10_home.1 + Min_Last10home.1 + 
-                                           Mean_Last3_total.1 + Max_Last3_total.1 + Min_Last3total.1 + 
-                                           Mean_Last5_total.1 + Max_Last5_total.1 + Min_Last5total.1 + 
-                                           Mean_Last7_total.1 + Max_Last7_total.1 + Min_Last7total.1 + 
-                                           Mean_Last10_total.1 + Max_Last10_total.1 + Min_Last10total.1 + 
-                                           Mean_Last3_home_opp.1 + Max_Last3_home_opp.1 + Min_Last3home_opp.1 + 
-                                           Mean_Last5_home_opp.1 + Max_Last5_home_opp.1 + Min_Last5home_opp.1 + 
-                                           Mean_Last7_home_opp.1 + Max_Last7_home_opp.1 + Min_Last7home_opp.1 + 
-                                           Mean_Last10_home_opp.1 + Max_Last10_home_opp.1 + Min_Last10home_opp.1 + 
-                                           Mean_Last3_total_opp.1 + Max_Last3_total_opp.1 + Min_Last3total_opp.1 + 
-                                           Mean_Last5_total_opp.1 + Max_Last5_total_opp.1 + Min_Last5total_opp.1 + 
-                                           Mean_Last7_total_opp.1 + Max_Last7_total_opp.1 + Min_Last7total_opp.1 + 
-                                           Mean_Last10_total_opp.1 + Max_Last10_total_opp.1 + Min_Last10total_opp.1 + 
-                                           Win_Last3_home.1 + Win_Last5_home.1 + Win_Last7_home.1 + 
-                                           Win_Last10_home.1 + Win_Last3_total.1 + Win_Last5_total.1 + 
-                                           Win_Last7_total.1 + Win_Last10_total.1))
+step(modmin, direction='forward', scope=((as.formula(td[,-1]))))
 
-modforw <- lm(formula = result ~ Days_LG + Wins_T + Streak_T + Mean_Pts_S_A + 
-                Max_Pts_S_A + Mean_Pts_A_A + Max_Pts_A_A + Days_LG.1 + Wins_T.1 + 
-                Loss_T.1 + Streak_T.1 + Str_Sch.1, data = td[, -1])
+modforw <- lm(formula = result ~ Win_Last10_home.1 + Win_Last10_total + 
+                Loss_T.1 + Loss_T + Days_LG + Mean_Last7_total.1 + Mean_Pts_A_T.1 + 
+                Mean_Pts_S_T.1 + Wins_T + Str_Sch.1 + Days_LG.1 + Max_Pts_A_A + 
+                Mean_Pts_S_T + Mean_Pts_A_T + Min_Last5total_opp.1 + Str_Sch + 
+                Min_Last3total + Mean_Last7_total_opp + Streak_T + Win_Last3_home.1 + 
+                Loss_H.1 + Wins_A + Loss_A + Mean_Last7_home.1 + Min_Last3home_opp.1 + 
+                Max_Last3_total_opp.1 + Max_Last3_total.1 + Max_Last5_total + 
+                mean_attend + Mean_Last3_total_opp, data = td[, -1])
 summary(modforw)
 winfor <- (predict(modforw, newdata=td19[,-1]) > 0) == (td19$result > 0)
 mean(winfor)
@@ -217,59 +265,17 @@ mean(predicted.classes == td19$Win)
 
 #selecao de variaveis
 modmin2 <- glm(Win~1, data = td[,-2], family=binomial(link = "logit"))
-step(modmin2, direction='forward', scope=(~Days_LG + Wins_T + Wins_A + Loss_T + Loss_A + Streak_T + 
-                                            Streak_A + OT_last + Str_Sch + Mean_Pts_S_A + Max_Pts_S_A + 
-                                            Min_Pts_S_A + Mean_Pts_S_T + Mean_Pts_A_A + Max_Pts_A_A + 
-                                            Min_Pts_A_A + Mean_Pts_A_T + Mean_Last3_away + Max_Last3_away + 
-                                            Min_Last3away + Mean_Last5_away + Max_Last5_away + Min_Last5away + 
-                                            Mean_Last7_away + Max_Last7_away + Min_Last7away + Mean_Last10_away + 
-                                            Max_Last10_away + Min_Last10away + Mean_Last3_total + Max_Last3_total + 
-                                            Min_Last3total + Mean_Last5_total + Max_Last5_total + Min_Last5total + 
-                                            Mean_Last7_total + Max_Last7_total + Min_Last7total + Mean_Last10_total + 
-                                            Max_Last10_total + Min_Last10total + Mean_Last3_away_opp + 
-                                            Max_Last3_away_opp + Min_Last3away_opp + Mean_Last5_away_opp + 
-                                            Max_Last5_away_opp + Min_Last5away_opp + Mean_Last7_away_opp + 
-                                            Max_Last7_away_opp + Min_Last7away_opp + Mean_Last10_away_opp + 
-                                            Max_Last10_away_opp + Min_Last10away_opp + Mean_Last3_total_opp + 
-                                            Max_Last3_total_opp + Min_Last3total_opp + Mean_Last5_total_opp + 
-                                            Max_Last5_total_opp + Min_Last5total_opp + Mean_Last7_total_opp + 
-                                            Max_Last7_total_opp + Min_Last7total_opp + Mean_Last10_total_opp + 
-                                            Max_Last10_total_opp + Min_Last10total_opp + Win_Last3_away + 
-                                            Win_Last5_away + Win_Last7_away + Win_Last10_away + Win_Last3_total + 
-                                            Win_Last5_total + Win_Last7_total + Win_Last10_total + Days_LG.1 + 
-                                            Wins_T.1 + Wins_H.1 + Loss_T.1 + Loss_H.1 + Streak_T.1 + 
-                                            Streak_H.1 + OT_last.1 + weekday + mean_attend + Travel.1 + 
-                                            Str_Sch.1 + Mean_Pts_S_H.1 + Max_Pts_S_H.1 + Min_Pts_S_H.1 + 
-                                            Mean_Pts_S_T.1 + Mean_Pts_A_H.1 + Max_Pts_A_H.1 + Min_Pts_A_H.1 + 
-                                            Mean_Pts_A_T.1 + Mean_Last3_home.1 + Max_Last3_home.1 + Min_Last3home.1 + 
-                                            Mean_Last5_home.1 + Max_Last5_home.1 + Min_Last5home.1 + 
-                                            Mean_Last7_home.1 + Max_Last7_home.1 + Min_Last7home.1 + 
-                                            Mean_Last10_home.1 + Max_Last10_home.1 + Min_Last10home.1 + 
-                                            Mean_Last3_total.1 + Max_Last3_total.1 + Min_Last3total.1 + 
-                                            Mean_Last5_total.1 + Max_Last5_total.1 + Min_Last5total.1 + 
-                                            Mean_Last7_total.1 + Max_Last7_total.1 + Min_Last7total.1 + 
-                                            Mean_Last10_total.1 + Max_Last10_total.1 + Min_Last10total.1 + 
-                                            Mean_Last3_home_opp.1 + Max_Last3_home_opp.1 + Min_Last3home_opp.1 + 
-                                            Mean_Last5_home_opp.1 + Max_Last5_home_opp.1 + Min_Last5home_opp.1 + 
-                                            Mean_Last7_home_opp.1 + Max_Last7_home_opp.1 + Min_Last7home_opp.1 + 
-                                            Mean_Last10_home_opp.1 + Max_Last10_home_opp.1 + Min_Last10home_opp.1 + 
-                                            Mean_Last3_total_opp.1 + Max_Last3_total_opp.1 + Min_Last3total_opp.1 + 
-                                            Mean_Last5_total_opp.1 + Max_Last5_total_opp.1 + Min_Last5total_opp.1 + 
-                                            Mean_Last7_total_opp.1 + Max_Last7_total_opp.1 + Min_Last7total_opp.1 + 
-                                            Mean_Last10_total_opp.1 + Max_Last10_total_opp.1 + Min_Last10total_opp.1 + 
-                                            Win_Last3_home.1 + Win_Last5_home.1 + Win_Last7_home.1 + 
-                                            Win_Last10_home.1 + Win_Last3_total.1 + Win_Last5_total.1 + 
-                                            Win_Last7_total.1 + Win_Last10_total.1))
+step(modmin2, direction='forward', scope=(as.formula(td[,-2])))
 
-modforw2 <- glm(formula = Win ~ Win_Last10_home.1 + Win_Last10_total + Loss_T.1 + 
-                  Loss_T + Min_Pts_A_H.1 + Min_Last5home.1 + Min_Last3total_opp.1 + 
-                  Mean_Last7_total.1 + Mean_Pts_A_T.1 + Mean_Pts_S_T.1 + Wins_A + 
-                  Mean_Pts_A_T + Mean_Pts_S_T + Wins_T + Win_Last5_home.1 + 
-                  Win_Last3_total + Min_Last3total + Max_Last7_total_opp + 
-                  Max_Pts_S_H.1 + Min_Last3home_opp.1 + Min_Last7home_opp.1 + 
-                  Loss_H.1 + mean_attend + Mean_Last10_home_opp.1 + Max_Pts_S_A + 
-                  OT_last.1, family = binomial(link = "logit"), data = td[, 
-                                                                          -2])
+modforw2 <- glm(formula = Win ~ Win_Last10_total.1 + Win_Last10_total + Wins_T.1 + 
+                  Wins_T + Min_Pts_A_H.1 + Mean_Last10_home.1 + Mean_Pts_A_T.1 + 
+                  Mean_Pts_S_T.1 + Loss_T + Days_LG + Days_LG.1 + Str_Sch.1 + 
+                  Max_Last7_total_opp + Min_Last3total + Min_Last5total_opp.1 + 
+                  Mean_Last5_total.1 + Mean_Pts_A_T + Mean_Pts_S_T + Win_Last3_total + 
+                  Str_Sch + Loss_H.1 + Min_Last10total + OT_last.1 + Max_Pts_S_A + 
+                  Min_Last7total_opp.1 + Min_Last5total.1 + Min_Last10total.1 + 
+                  Mean_Last10_total_opp.1 + mean_attend, family = binomial(link = "logit"), 
+                data = td[, -2])
 summary(modforw2)
 probabilities3 <- modforw2 %>% predict(td19[,-2], type = "response")
 predicted.classes3 <- ifelse(probabilities3 > 0.5, "TRUE", "FALSE")
