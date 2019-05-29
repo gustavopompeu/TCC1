@@ -89,4 +89,7 @@ prev[which(is.na(prev))] <- 0
 
 #save(tabela, lasvegas, siglas, prev, file="lasvegas.rda")
 
+overunder <- which(prev>200)
+even <- which(prev == 0)
+mean((prev[-c(overunder,even)] > 0) == (teste19$result_Vis[-c(overunder,even)] > 0))
 

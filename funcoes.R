@@ -76,7 +76,7 @@ atualiza <- function(){
   jogos_2019 <- tabela_temporada(2019)
   ind <- which(is.na(jogos_2019$PTS_Visitor))[1]
   dat <- jogos_2019[ind,1]
-  jog <- which(jogos_2019$Date == dat)
+  jog <- which(jogos_2019$Date == dat+1)
   ind2 <- jog[length(jog)]
   jogos_2019 <- jogos_2019[1:ind2,]
   save(jogos_2001,jogos_2002,jogos_2003,jogos_2004,jogos_2005,jogos_2006,jogos_2007,jogos_2008,
@@ -171,7 +171,13 @@ base_var <- function(oct_games){
     #publico sempre NA pois o time referencia esta jogando fora de casa
     a[j,6] <- NA
     #pega da tabela de resultados pra saber se esse jogo foi pra prorrogacao
-    if(is.na(oct_games[i,6]) == T) a[j,7] <- FALSE; if(is.na(oct_games[i,6]) == F) a[j,7] <- TRUE
+    if(is.na(oct_games[i,6])){
+      a[j,7] <- 0
+    }else if(oct_games[i,6] == "OT"){
+      a[j,7] <- 1
+    }else{
+      a[j,7] <- as.numeric(gsub("([0-9]+).*$", "\\1", oct_games[i,6]))
+    }
     #calculo da diferenca de pontos entre os times para saber o vencedor
     result <- a[j,3] - a[j,4]
     if(is.na(result)){
@@ -872,7 +878,13 @@ base_var <- function(oct_games){
     a[j,4] <- oct_games[i,3]
     a[j,5] <- TRUE
     a[j,6] <- oct_games[i,7]
-    if(is.na(oct_games[i,6]) == T) a[j,7] <- FALSE; if(is.na(oct_games[i,6]) == F) a[j,7] <- TRUE
+    if(is.na(oct_games[i,6])){
+      a[j,7] <- 0
+    }else if(oct_games[i,6] == "OT"){
+      a[j,7] <- 1
+    }else{
+      a[j,7] <- as.numeric(gsub("([0-9]+).*$", "\\1", oct_games[i,6]))
+    }
     if(is.na(result)){
       a[j,8] <- NA
     }else{
@@ -1642,29 +1654,41 @@ junto <- function(a){
 final_base <- function(base){
   dados <- junto(base)
   dados <- dados[,-c(1:7,11:13,24:25,126:134,136:138)]
+  
+  #tirando variaveis de casa pro time de fora e de fora pro time de casa
+  dados <- dados[,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
+  colnames(dados)[1:75] <- paste(colnames(dados)[1:75], "_Vis", sep="")
+  num_car <- nchar(colnames(dados)[c(76:83, 86:151)])
+  j <- 1
+  for(i in c(76:83, 86:151)){
+    colnames(dados)[i] <- substr(colnames(dados)[i], 1, (num_car[j]-2))
+    j <- j+1
+  }
+  colnames(dados)[c(76:83, 86:151)] <- paste(colnames(dados)[c(76:83, 86:151)], "_Home", sep="")
+  colnames(dados)[85] <- "mean_attend_Home"
   return(dados)
 }
 
 ################# bases finais
-#final2001 <- final_base(base2001)
-#final2002 <- final_base(base2002)
-#final2003 <- final_base(base2003)
-#final2004 <- final_base(base2004)
-#final2005 <- final_base(base2005)
-#final2006 <- final_base(base2006)
-#final2007 <- final_base(base2007)
-#final2008 <- final_base(base2008)
-#final2009 <- final_base(base2009)
-#final2010 <- final_base(base2010)
-#final2011 <- final_base(base2011)
-#final2012 <- final_base(base2012)
-#final2013 <- final_base(base2013)
-#final2014 <- final_base(base2014)
-#final2015 <- final_base(base2015)
-#final2016 <- final_base(base2016)
-#final2017 <- final_base(base2017)
-#final2018 <- final_base(base2018)
-#final2019 <- final_base(base2019)
+final2001 <- final_base(base2001)
+final2002 <- final_base(base2002)
+final2003 <- final_base(base2003)
+final2004 <- final_base(base2004)
+final2005 <- final_base(base2005)
+final2006 <- final_base(base2006)
+final2007 <- final_base(base2007)
+final2008 <- final_base(base2008)
+final2009 <- final_base(base2009)
+final2010 <- final_base(base2010)
+final2011 <- final_base(base2011)
+final2012 <- final_base(base2012)
+final2013 <- final_base(base2013)
+final2014 <- final_base(base2014)
+final2015 <- final_base(base2015)
+final2016 <- final_base(base2016)
+final2017 <- final_base(base2017)
+final2018 <- final_base(base2018)
+final2019 <- final_base(base2019)
 
 #save(final2001,final2002,final2003,final2004,final2005,final2006,final2007,
 #     final2008,final2009,final2010,final2011,final2012,
