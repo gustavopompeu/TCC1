@@ -1,4 +1,4 @@
-teste19 <- final2019[1:1230,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
+teste19 <- final2019[1:1230,]
 
 prev_temp_tree <- function(temp_inicio){
   final <- data.frame()
@@ -12,15 +12,13 @@ prev_temp_tree <- function(temp_inicio){
       final <- rbind(final,base[1:1230,])
     }
   }
-  
-  #tirando variaveis de casa pro time de fora e de fora pro time de casa
-  final <- final[,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
+
   
   #encontrando os padroes
-  teste19 <- final2019[1:1230,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
+  teste19 <- final2019[1:1230,]
   padrao19 <- is.na(teste19[,-c(1,2)])
   
-  for(i in 1:length(teste19$Win)){
+  for(i in 1:length(teste19$Win_Vis)){
     for(j in 1:ncol(padrao19)){
       padrao19[i,j] <- as.numeric(padrao19[i,j])
     }
@@ -38,7 +36,7 @@ prev_temp_tree <- function(temp_inicio){
     td19 <- td19[,colun]
     td <- final[,colun]
     td <- td[rowSums(is.na(td)) == 0,]
-    mod <- tree(result~., data=td[,-1])
+    mod <- tree(result_Vis~., data=td[,-1])
     win <- predict(mod, newdata=td19[,-1])
     vet <- c(vet,win)
   }
@@ -47,6 +45,16 @@ prev_temp_tree <- function(temp_inicio){
   vet <- vet[ord]
   return(vet)
 }
+
+#######################
+acerto_ano_tree <- c()
+for(j in 2001:2018){
+  prev_tree <- prev_temp_tree(j)
+  acerto_ano_tree[(j-2000)] <- mean((prev_tree > 0) == (teste19$result_Vis > 0))
+}
+names(acerto_ano_tree) <- 2001:2018
+data.frame(acerto_ano_tree)
+#######################
 
 ####################
 

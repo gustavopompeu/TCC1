@@ -1,8 +1,8 @@
-teste19 <- final2019[1:1230,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
+teste19 <- final2019[1:1230,]
 
-prev_temp_log <- function(temp_inicio){
+prev_temp_prob <- function(temp_inicio){
   final <- data.frame()
-  for(i in temp_inicio){
+  for(i in temp_inicio:2018){
     assign("base",get(paste("final",i,sep="")))
     if(i == 2001 | i == 2002 | i == 2003 | i == 2004){
       final <- rbind(final,base[1:1189,])
@@ -13,14 +13,11 @@ prev_temp_log <- function(temp_inicio){
     }
   }
   
-  #tirando variaveis de casa pro time de fora e de fora pro time de casa
-  final <- final[,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
-  
   #encontrando os padroes
-  teste19 <- final2019[1:1230,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
+  teste19 <- final2019[1:1230,]
   padrao19 <- is.na(teste19[,-c(1,2)])
   
-  for(i in 1:length(teste19$Win)){
+  for(i in 1:length(teste19$Win_Vis)){
     for(j in 1:ncol(padrao19)){
       padrao19[i,j] <- as.numeric(padrao19[i,j])
     }
@@ -38,7 +35,7 @@ prev_temp_log <- function(temp_inicio){
     td19 <- td19[,colun]
     td <- final[,colun]
     td <- td[rowSums(is.na(td)) == 0,]
-    a <- glm(Win~., data = td[,-2], family=binomial(link = "probit"))
+    a <- glm(Win_Vis~., data = td[,-2], family=binomial(link = "probit"))
     probabilities <- a %>% predict(td19[,-2], type = "response")
     predicted.classes <- ifelse(probabilities > 0.5, "TRUE", "FALSE")
     vet <- c(vet,predicted.classes)
@@ -48,6 +45,17 @@ prev_temp_log <- function(temp_inicio){
   vet <- vet[ord]
   return(vet)
 }
+
+
+####################
+acerto_ano_prob <- c()
+for(j in 2001:2018){
+  prev_prob <- prev_temp_prob(j)
+  acerto_ano_prob[(j-2000)] <- mean(prev_prob == teste19$Win_Vis)
+}
+names(acerto_ano_prob) <- 2001:2018
+data.frame(acerto_ano_prob)
+####################
 
 ####################
 

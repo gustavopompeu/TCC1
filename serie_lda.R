@@ -1,4 +1,4 @@
-teste19 <- final2019[1:1230,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
+teste19 <- final2019[1:1230,]
 
 prev_temp_lda <- function(temp_inicio){
   final <- data.frame()
@@ -13,14 +13,11 @@ prev_temp_lda <- function(temp_inicio){
     }
   }
   
-  #tirando variaveis de casa pro time de fora e de fora pro time de casa
-  final <- final[,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
-  
   #encontrando os padroes
-  teste19 <- final2019[1:1230,-c(5,8,11,14,16:18,23:25,42:53,78:89,106:109,117,120,123,132:134,139:141,143:154,179:190,215:218)]
+  teste19 <- final2019[1:1230,]
   padrao19 <- is.na(teste19[,-c(1,2)])
   
-  for(i in 1:length(teste19$Win)){
+  for(i in 1:length(teste19$Win_Vis)){
     for(j in 1:ncol(padrao19)){
       padrao19[i,j] <- as.numeric(padrao19[i,j])
     }
@@ -38,7 +35,7 @@ prev_temp_lda <- function(temp_inicio){
      td19 <- td19[,colun]
      td <- final[,colun]
      td <- td[rowSums(is.na(td)) == 0,]
-     mod <- lda(Win~., data=td[,-2])
+     mod <- lda(Win_Vis~., data=td[,-2])
      prd <- predict(mod, newdata=td19[,-2])
      win <- as.logical(prd$class)
      names(win) <- rownames(td19)
@@ -49,6 +46,16 @@ prev_temp_lda <- function(temp_inicio){
   vet <- vet[ord]
   return(vet)
 }
+
+####################
+acerto_ano_lda <- c()
+for(j in 2001:2018){
+  prev_lda <- prev_temp_lda(j)
+  acerto_ano_lda[(j-2000)] <- mean(prev_lda == teste19$Win_Vis)
+}
+names(acerto_ano_lda) <- 2001:2018
+data.frame(acerto_ano_lda)
+####################
 
 ####################
 

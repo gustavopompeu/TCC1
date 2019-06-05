@@ -6,7 +6,7 @@ load(file="final.rda")
 
 #criando a base grande com as temporadas para modelagem
 final <- data.frame()
-for(i in 2001:2018){
+for(i in 2007:2018){
   assign("base",get(paste("final",i,sep="")))
   if(i == 2001 | i == 2002 | i == 2003 | i == 2004){
     final <- rbind(final,base[1:1189,])
@@ -24,7 +24,7 @@ for(i in 2001:2018){
 teste19 <- final2019[1:1230,]
 padrao19 <- is.na(teste19[,-c(1,2)])
 
-for(i in 1:length(teste19$Win)){
+for(i in 1:length(teste19$Win_Vis)){
   for(j in 1:ncol(padrao19)){
     padrao19[i,j] <- as.numeric(padrao19[i,j])
   }
@@ -35,6 +35,7 @@ nomes <- names(summary(as.factor(oi19)))
 
 #Reg Linear
 vet <- c()
+start_time <- Sys.time()
 for(i in 1:length(nomes)){
   full19 <- oi19==nomes[i]
   td19 <- teste19[full19,]
@@ -46,30 +47,38 @@ for(i in 1:length(nomes)){
   win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result_Vis > 0)
   vet <- c(vet,win)
 }
-
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)
 mean(vet)
 
 #Reg Logistica
 vet1 <- c()
+start_time <- Sys.time()
 library(dplyr)
 for(i in 1:length(nomes)){
-    full19 <- oi19==nomes[i]
-    td19 <- teste19[full19,]
-    colun <- !is.na(td19[1,])
-    td19 <- td19[,colun]
-    td <- final[,colun]
-    td <- td[rowSums(is.na(td)) == 0,]
-    a <- glm(Win_Vis~., data = td[,-2], family=binomial(link = "logit"))
-    probabilities <- a %>% predict(td19[,-2], type = "response")
-    predicted.classes <- ifelse(probabilities > 0.5, "TRUE", "FALSE")
-    win <- predicted.classes == td19$Win_Vis
-    vet1 <- c(vet1,win)
+  full19 <- oi19==nomes[i]
+  td19 <- teste19[full19,]
+  colun <- !is.na(td19[1,])
+  td19 <- td19[,colun]
+  td <- final[,colun]
+  td <- td[rowSums(is.na(td)) == 0,]
+  a <- glm(Win_Vis~., data = td[,-2], family=binomial(link = "logit"))
+  probabilities <- a %>% predict(td19[,-2], type = "response")
+  predicted.classes <- ifelse(probabilities > 0.5, "TRUE", "FALSE")
+  win <- predicted.classes == td19$Win_Vis
+  vet1 <- c(vet1,win)
 }
-
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)
 mean(vet1)
 
 #Probit
 vet2 <- c()
+start_time <- Sys.time()
 library(dplyr)
 for(i in 1:length(nomes)){
   full19 <- oi19==nomes[i]
@@ -84,10 +93,13 @@ for(i in 1:length(nomes)){
   win <- predicted.classes == td19$Win_Vis
   vet2 <- c(vet2,win)
 }
-
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)
 mean(vet2)
 
-#SVM param mudados
+#SVM parametros mudados
 vet3 <- c()
 library(e1071)
 for(i in 1:length(nomes)){
@@ -101,11 +113,11 @@ for(i in 1:length(nomes)){
   win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result_Vis > 0)
   vet3 <- c(vet3,win)
 }
-
 mean(vet3)
 
 #SVM
 vet3.1 <- c()
+start_time <- Sys.time()
 library(e1071)
 for(i in 1:length(nomes)){
   full19 <- oi19==nomes[i]
@@ -118,11 +130,16 @@ for(i in 1:length(nomes)){
   win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result_Vis > 0)
   vet3.1 <- c(vet3.1,win)
 }
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)*60*60
 
 mean(vet3.1)
 
 #LDA
 vet4 <- c()
+start_time <- Sys.time()
 library(MASS)
 for(i in 1:length(nomes)){
   full19 <- oi19==nomes[i]
@@ -136,11 +153,15 @@ for(i in 1:length(nomes)){
   win <- as.logical(prd$class) == td19$Win_Vis
   vet4 <- c(vet4,win)
 }
-
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)
 mean(vet4)
 
 #random forest
 vet5 <- c()
+start_time <- Sys.time()
 library(randomForest)
 for(i in 1:length(nomes)){
   full19 <- oi19==nomes[i]
@@ -153,11 +174,15 @@ for(i in 1:length(nomes)){
   win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result_Vis > 0)
   vet5 <- c(vet5,win)
 }
-
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)*60*60
 mean(vet5)
 
 #reg arvore
 vet6 <- c()
+start_time <- Sys.time()
 library(tree)
 for(i in 1:length(nomes)){
   full19 <- oi19==nomes[i]
@@ -170,11 +195,15 @@ for(i in 1:length(nomes)){
   win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result_Vis > 0)
   vet6 <- c(vet6,win)
 }
-
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)
 mean(vet6)
 
 #class em arvore
 vet7 <- c()
+start_time <- Sys.time()
 library(tree)
 for(i in 1:length(nomes)){
   full19 <- oi19==nomes[i]
@@ -189,12 +218,15 @@ for(i in 1:length(nomes)){
   win <- predicted.classes == td19$Win_Vis
   vet7 <- c(vet7,win)
 }
-
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)
 mean(vet7)
 
 #Reg Linear c/ forward
 vet8 <- c()
-library(leaps)
+start_time <- Sys.time()
 for(i in 1:length(nomes)){
   full19 <- oi19==nomes[i]
   td19 <- teste19[full19,]
@@ -207,12 +239,16 @@ for(i in 1:length(nomes)){
   win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result_Vis> 0)
   vet8 <- c(vet8,win)
 }
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)*60
 mean(vet8)
 
 #Reg Logistica c/ forward
 vet9 <- c()
+start_time <- Sys.time()
 library(dplyr)
-library(leaps)
 for(i in 1:length(nomes)){
   full19 <- oi19==nomes[i]
   td19 <- teste19[full19,]
@@ -227,12 +263,16 @@ for(i in 1:length(nomes)){
   win <- predicted.classes == td19$Win_Vis
   vet9 <- c(vet9,win)
 }
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)*60*60
 mean(vet9)
 
 #Reg Probit c/ forward
 vet10 <- c()
+start_time <- Sys.time()
 library(dplyr)
-library(leaps)
 for(i in 1:length(nomes)){
   full19 <- oi19==nomes[i]
   td19 <- teste19[full19,]
@@ -247,6 +287,10 @@ for(i in 1:length(nomes)){
   win <- predicted.classes == td19$Win_Vis
   vet10 <- c(vet10,win)
 }
+end_time <- Sys.time()
+tempo <- end_time - start_time
+tempo
+as.numeric(tempo)*60*60
 mean(vet10)
 
 #######REG LINEAR
@@ -260,30 +304,22 @@ pad <- standardize(formula = result ~ ., data = td[, -74])
 
 novo <- pad$data
 
-####REG LOGISTICA
-a <- glm(Win~., data = td[,-2], family=binomial(link = "logit"))
+####standardize
+
+full19 <- oi19==nomes[1]
+td19 <- teste19[full19,]
+colun <- !is.na(td19[1,])
+td19 <- td19[,colun]
+td <- final[,colun]
+td <- td[rowSums(is.na(td)) == 0,]
+a <- glm(Win_Vis~., data = td[,-2], family=binomial(link = "logit"))
 summary(a)
-library(dplyr)
-probabilities <- a %>% predict(td19[,-2], type = "response")
-predicted.classes <- ifelse(probabilities > 0.5, "TRUE", "FALSE")
-mean(predicted.classes == td19$Win)
 
+pad <- standardize(formula = as.formula(td[,-2]), data = td[, -2], family=binomial(link = "logit"))
+novo <- pad$data
 
-#########SVM
-library(e1071)
-teste <- svm(result~., data=final[,-1], cost=8, gamma=10^-4)
-summary(teste)
-winsvm <- (predict(teste, newdata=teste19[,-1]) > 0) == (teste19$result > 0)
-mean(winsvm)
-
-teste19 <- teste19[rowSums(is.na(teste19)) == 0,]
-
-###########RANDOM FOREST
-require(randomForest)
-mod <- randomForest(result~., data=td[,-1])
-mod
-mean((predict(mod, newdata=td19[,-1]) > 0) == (td19$result > 0))
-
+modnovo <- glm(Win_Vis~., data = novo, family=binomial(link = "logit"))
+summary(modnovo)
 
 ####################TESTES - MUITO DEMORADO
 #melhores parametros para o svm

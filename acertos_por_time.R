@@ -37,6 +37,10 @@ for(i in 1:30){
 
 
 tab_acerto <- tab_acerto[order(tab_acerto$Prev_Acerto, decreasing = T),]
+tab_acerto$Win_Prev <- tab_acerto[,5]+tab_acerto[,11]
+tab_acerto$Win <- tab_acerto[,6]+tab_acerto[,12]
+tab_acerto$Loss_Prev <- tab_acerto[,7]+tab_acerto[,9]
+tab_acerto$Loss <- tab_acerto[,8]+tab_acerto[,10]
 
 tab_acerto_pct <- data.frame(tab_acerto$Team,tab_acerto$Prev_Acerto/82, tab_acerto$Prev_Acerto_Home/41, tab_acerto$Prev_Acerto_Away/41,
                              (tab_acerto$Away_Win_Prev+tab_acerto$Home_Win_Prev)/(tab_acerto$Away_Win+tab_acerto$Home_Win),
@@ -60,6 +64,8 @@ prevista <- class[,c(1,3)]
 prevista <- prevista[order(prevista$`Vitórias previstas`, decreasing = T),]
 rownames(real) <- NULL
 rownames(prevista) <- NULL
+compara <- cbind(real, prevista$`Vitórias previstas`)
+colnames(compara)[3] <- "Vitórias previstas"
 
 library(sqldf)
 bases <- rbind(base2001,base2002,base2003,base2004,base2005,base2006,base2007,base2008,base2009,base2010,base2011,base2013,base2014,base2015,base2016,base2017,base2018)
@@ -68,9 +74,12 @@ confer <- c("E","E","W","E","E","W","W","W","W","W","E","E","E","E","E","E","W",
 confer <- as.factor(confer)
 conf$Conferencia <- confer
 
-conf <- conf[match(prevista$Time, conf$Team),]
-prevista$Conf <- conf$Conferencia
-prevista_east <- prevista[prevista$Conf=="E",1:2]
-prevista_west <- prevista[prevista$Conf=="W",1:2]
-rownames(prevista_east) <- NULL
-rownames(prevista_west) <- NULL
+conf <- conf[match(compara$Time, conf$Team),]
+compara$Conf <- conf$Conferencia
+compara_east <- compara[compara$Conf=="E",1:3]
+compara_west <- compara[compara$Conf=="W",1:3]
+rownames(compara_east) <- NULL
+rownames(compara_west) <- NULL
+
+compara_east
+compara_west
