@@ -103,15 +103,17 @@ mean(vet2)
 vet3 <- c()
 library(e1071)
 for(i in 1:length(nomes)){
+  if(i==1){
   full19 <- oi19==nomes[i]
   td19 <- teste19[full19,]
   colun <- !is.na(td19[1,])
   td19 <- td19[,colun]
   td <- final[,colun]
   td <- td[rowSums(is.na(td)) == 0,]
-  mod <- svm(result_Vis~., data=td[,-1], cost=8, gamma=10^-4)
+  mod <- svm(result_Vis~., data=td[,-1], cost=3, gamma=10^-4)
   win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result_Vis > 0)
   vet3 <- c(vet3,win)
+  }
 }
 mean(vet3)
 
@@ -293,19 +295,7 @@ tempo
 as.numeric(tempo)*60*60
 mean(vet10)
 
-#######REG LINEAR
-mod <- lm(result~., data=td[,-1])
-summary(mod)
-win <- (predict(mod, newdata=td19[,-1]) > 0) == (td19$result > 0)
-mean(win)
-
-library(standardize)
-pad <- standardize(formula = result ~ ., data = td[, -74])
-
-novo <- pad$data
-
 ####standardize
-
 full19 <- oi19==nomes[1]
 td19 <- teste19[full19,]
 colun <- !is.na(td19[1,])
@@ -315,23 +305,56 @@ td <- td[rowSums(is.na(td)) == 0,]
 a <- glm(Win_Vis~., data = td[,-2], family=binomial(link = "logit"))
 summary(a)
 
+library(standardize)
 pad <- standardize(formula = as.formula(td[,-2]), data = td[, -2], family=binomial(link = "logit"))
 novo <- pad$data
+
+pad19 <- standardize(formula = as.formula(td19[,-2]), data = td19[, -2], family=binomial(link = "logit"))
+novo19 <- pad19$data
 
 modnovo <- glm(Win_Vis~., data = novo, family=binomial(link = "logit"))
 summary(modnovo)
 
-####################TESTES - MUITO DEMORADO
+library(dplyr)
+probabilities <- modnovo %>% predict(novo19, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "TRUE", "FALSE")
+win <- predicted.classes == td19$Win_Vis
+mean(win)
+
+
+####standardize teste todos
+vet11 <- c()
+for(i in 1:length(nomes)){
+full19 <- oi19==nomes[i]
+td19 <- teste19[full19,]
+colun <- !is.na(td19[1,])
+td19 <- td19[,colun]
+td <- final[,colun]
+td <- td[rowSums(is.na(td)) == 0,]
+a <- glm(Win_Vis~., data = td[,-2], family=binomial(link = "logit"))
+summary(a)
+
+library(standardize)
+pad <- standardize(formula = as.formula(td[,-2]), data = td[, -2], family=binomial(link = "logit"))
+novo <- pad$data
+
+pad19 <- standardize(formula = as.formula(td19[,-2]), data = td19[, -2], family=binomial(link = "logit"))
+novo19 <- pad19$data
+
+modnovo <- glm(Win_Vis~., data = novo, family=binomial(link = "logit"))
+summary(modnovo)
+
+library(dplyr)
+probabilities <- modnovo %>% predict(novo19, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "TRUE", "FALSE")
+win <- predicted.classes == td19$Win_Vis
+vet11 <- c(vet11,win)
+}
+mean(vet11)
+
 #melhores parametros para o svm
+library(e1071)
 tuneResult <- tune(svm, result_Vis ~ ., data = td[,-1],
-                   ranges = list(gamma=c(10^-5,10^-4,10^-3), cost = c(7,8,9)))
+                   ranges = list(gamma=c(10^-5,10^-4,10^-3), cost = c(3)))
 
-
-####melhores modelos com x variaveis
-library(leaps)
-modelos<-regsubsets(result ~ .,data=td[,-72],nbest=1,nvmax=20,really.big=T)
-summary(leaps)
-
-###selecao stepwise
-library(MASS)
-stepAIC(mod, direction = "both")
+#10^-4 e 3

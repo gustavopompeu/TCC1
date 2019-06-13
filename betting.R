@@ -2,12 +2,7 @@
 load(file="lasvegas.rda")
 load(file="final.rda")
 
-#porcentagem de acerto das casas de aposta \/
-mean((prev > 0) == (final2019$result[1:1230] > 0))
-
-
 ############# como cheguei no las vegas
-
 ###web scraping das lines das casas de aposta
 tabela <- data.frame()
 ini <- 401070213
@@ -89,9 +84,13 @@ prev[which(is.na(prev))] <- 0
 
 #save(tabela, lasvegas, siglas, prev, file="lasvegas.rda")
 
+
+##4 jogos nao tem a line, veio o over/under
 overunder <- which(prev>200)
+##alguns jogos era line even
 even <- which(prev == 0)
-prev[c(overunder,even)] <- NaN
+#tirando esses jogos
+prev[overunder] <- NaN
 prev_apostas <- prev
 
 b2 <- c()
@@ -117,6 +116,3 @@ plot(ult2, type="l", xlim=c(0,1230), main="Porcentagem de Acerto das Previsões 
      xlab="Número do Jogo", ylab="% Acerto", ylim=c(0.45,0.9))
 text(600,.88,"Casas de Aposta",cex=1.5)
 abline(h=b2[1230], lty=2, col="blue")
-
-
-sum(abs(prev_apostas - teste19$result_Vis), na.rm=T) / 1210
