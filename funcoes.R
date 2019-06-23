@@ -1,9 +1,13 @@
-##Leitura dos dados da internet
+#funções para web scraping dos dados da internet
+
 ler_jogos <- function(url){
   library(rvest)
   html <- read_html(url)
-  #nodes obtidos com o SelectorGadget, extensao do google chrome
-  games <- html_nodes(html, ".center+ .center , .left:nth-child(5) , td+ .right , .left:nth-child(3) , .poptip.right , .left:nth-child(1)")
+  #nodes obtidos com o SelectorGadget, extensão do google chrome
+  games <- html_nodes(html, ".center+ .center , 
+                      .left:nth-child(5), td+ .right , 
+                      .left:nth-child(3) , .poptip.right , 
+                      .left:nth-child(1)")
   texto <- html_text(games)
   tabela <- data.frame()
   j <- 1
@@ -24,15 +28,21 @@ ler_jogos <- function(url){
 
 tabela_temporada <- function(year){
   if(year == 2019){
-    months <- c("october","november","december","january","february","march","april")
+    months <- c("october","november","december","january",
+                "february","march","april","may","june")
   }else if(year == 2012){
-    months <- c("december","january","february","march","april","may","june")
+    months <- c("december","january","february","march",
+                "april","may","june")
   }else if(year == 2006 | year == 2005 | year == 2000){
-    months <- c("november","december","january","february","march","april","may","june")
+    months <- c("november","december","january","february",
+                "march","april","may","june")
   }else{
-    months <- c("october","november","december","january","february","march","april","may","june")
+    months <- c("october","november","december","january",
+                "february","march","april","may","june")
   }
-  cola1 <- paste("https://www.basketball-reference.com/leagues/NBA_",year,sep="")
+  cola1 <- 
+    paste("https://www.basketball-reference.com/leagues/NBA_",
+                 year,sep="")
   cola2 <- paste(cola1,"_games-",months,sep="")
   url <- paste(cola2,".html",sep="")
   teste <- data.frame()
@@ -40,7 +50,8 @@ tabela_temporada <- function(year){
     b <- ler_jogos(url[i])
     teste <- rbind(teste,b)
   }
-  names(teste) <- c("Date", "Visitor", "PTS_Visitor", "Home", "PTS_Home", "OT", "Attend")
+  names(teste) <- c("Date", "Visitor", "PTS_Visitor", "Home", 
+                    "PTS_Home", "OT", "Attend")
   teste$PTS_Visitor <- as.numeric(teste$PTS_Visitor)
   teste$PTS_Home <- as.numeric(teste$PTS_Home)
   teste$Attend <- as.numeric(gsub(",", "", teste$Attend))
@@ -69,6 +80,7 @@ tabela_temporada <- function(year){
 #jogos_2016 <- tabela_temporada(2016)
 #jogos_2017 <- tabela_temporada(2017)
 #jogos_2018 <- tabela_temporada(2018)
+jogos_2019 <- tabela_temporada(2019)
 
 ##Temporada atual, atualizando diariamente
 atualiza <- function(){
@@ -94,6 +106,8 @@ atualiza <- function(){
        final2013,final2014,final2015,final2016,final2017,
        final2018,final2019, file="final.rda")
 }
+
+atualiza()
 
 ##Criacao da base de dados
 #cada linha e referente a um time e a um jogo
@@ -171,13 +185,7 @@ base_var <- function(oct_games){
     #publico sempre NA pois o time referencia esta jogando fora de casa
     a[j,6] <- NA
     #pega da tabela de resultados pra saber se esse jogo foi pra prorrogacao
-    if(is.na(oct_games[i,6])){
-      a[j,7] <- 0
-    }else if(oct_games[i,6] == "OT"){
-      a[j,7] <- 1
-    }else{
-      a[j,7] <- as.numeric(gsub("([0-9]+).*$", "\\1", oct_games[i,6]))
-    }
+    if(is.na(oct_games[i,6]) == T) a[j,7] <- FALSE; if(is.na(oct_games[i,6]) == F) a[j,7] <- TRUE
     #calculo da diferenca de pontos entre os times para saber o vencedor
     result <- a[j,3] - a[j,4]
     if(is.na(result)){
@@ -878,13 +886,7 @@ base_var <- function(oct_games){
     a[j,4] <- oct_games[i,3]
     a[j,5] <- TRUE
     a[j,6] <- oct_games[i,7]
-    if(is.na(oct_games[i,6])){
-      a[j,7] <- 0
-    }else if(oct_games[i,6] == "OT"){
-      a[j,7] <- 1
-    }else{
-      a[j,7] <- as.numeric(gsub("([0-9]+).*$", "\\1", oct_games[i,6]))
-    }
+    if(is.na(oct_games[i,6]) == T) a[j,7] <- FALSE; if(is.na(oct_games[i,6]) == F) a[j,7] <- TRUE
     if(is.na(result)){
       a[j,8] <- NA
     }else{
@@ -1634,7 +1636,7 @@ base_var <- function(oct_games){
 #base2016 <- base_var(jogos_2016)
 #base2017 <- base_var(jogos_2017)
 #base2018 <- base_var(jogos_2018)
-#base2019 <- base_var(jogos_2019)
+base2019 <- base_var(jogos_2019)
 
 #save(base2001,base2002,base2003,base2004,base2005,base2006,base2007,base2008,
 #     base2009,base2010,base2011,base2012,base2013,base2014,
@@ -1694,3 +1696,96 @@ final2019 <- final_base(base2019)
 #     final2008,final2009,final2010,final2011,final2012,
 #     final2013,final2014,final2015,final2016,final2017,
 #     final2018,final2019, file="final.rda")
+
+
+#salvar em csv
+for(i in 2001:2019){
+  assign("base",get(paste("jogos_",i,sep="")))
+  nome <- paste("jogos_", i, sep="")
+  nome2 <- paste(nome,".csv",sep="")
+  write.csv(base, file=nome2)
+}
+
+
+########## linhas de aposta
+###web scraping das lines das casas de aposta
+tabela <- data.frame()
+ini <- 401070213
+library(rvest)
+for(i in 1:5000){
+  tryCatch({
+    a <- "http://www.espn.com/nba/game?gameId="
+    url <- paste(a,ini,sep="")
+    if(ini == 401070242){
+      ini <- ini+239
+    }
+    download.file(url, destfile = "scrapedpage.html", quiet=TRUE)
+    html <- read_html("scrapedpage.html")
+    #nodes obtidos com o SelectorGadget, extensao do google chrome
+    games <- html_nodes(html, ".short-name , #gamepackage-matchup-wrap .icon-font-before , #gamepackage-matchup-wrap .icon-font-after , .long-name , #gamepackage-game-information li")
+    texto <- html_text(games)
+    if(!is.na(texto[1])){
+      tabela[i,1] <- paste(texto[1],texto[2])
+      tabela[i,2] <- texto[3]
+      tabela[i,3] <- texto[4]
+      tabela[i,4] <- paste(texto[5],texto[6])
+      tabela[i,5] <- texto[20]
+    }
+    ini <- ini+1
+    if(sum(!is.na(tabela[,1])) == 1230){
+      break
+    }
+  }, error=function(e){})
+}
+
+#arrumacao da base
+lasvegas <- tabela[!is.na(tabela[,1]),]
+colnames(lasvegas) <- c("Team", "PTS", "PTS_Opp", "Opponent", "Odds")
+rownames(lasvegas) <- NULL
+lasvegas$Team[which(lasvegas$Team == "LA Clippers")] <- "Los Angeles Clippers"
+lasvegas$Opponent[which(lasvegas$Opponent == "LA Clippers")] <- "Los Angeles Clippers"
+lasvegas[,6] <- 0
+for(i in 1:1230){
+  if(i != 152 & i != 717){
+    lasvegas[i,6] <- which(lasvegas$Team[i] == jogos_2019$Visitor & lasvegas$Opponent[i] == jogos_2019$Home & 
+                             lasvegas$PTS[i] == jogos_2019$PTS_Visitor & lasvegas$PTS_Opp[i] == jogos_2019$PTS_Home)
+  }
+}
+#jogos 152 e 717 foram entre os mesmos times e teve o mesmo placar, tive que ver manualmente qual era qual
+lasvegas[152,6] <- 146
+lasvegas[717,6] <- 717
+colnames(lasvegas)[6] <- "Indice"
+lasvegas <- lasvegas[order(lasvegas$Indice),]
+
+
+#associando os times as siglas
+library(sqldf)
+siglas <-  sqldf("select DISTINCT Visitor as 'Team' from jogos_2019")
+siglas[,2] <- c("PHI", "OKC", "MIL", "BKN", "NO", "MEM", "DEN", "ATL", "MIA", "DAL",
+                "UTAH", "MIN", "CLE", "CHI", "LAL", "NY", "IND", "SAC", "CHA", "BOS",
+                "GS", "DET", "PHX", "HOU", "ORL", "SA", "TOR", "WSH", "LAC", "POR")
+colnames(siglas)[2] <- "Sigla"
+
+library(stringr)
+numextract <- function(string){ 
+  str_extract(string, "\\-*\\d+\\.*\\d*")
+}
+
+#extraindo o numero da previsao das casas de aposta
+prev <- c()
+for(i in 1:1230){
+  temp <- substring(lasvegas$Odds[i],7)
+  time <- str_extract(temp, "[aA-zZ]+")
+  ind <- which(lasvegas$Team[i] == siglas$Team)
+  if(time == siglas[ind,2]){
+    prev[i] <- abs(as.numeric(numextract(temp)))
+  }else{
+    prev[i] <- as.numeric(numextract(temp))
+  }
+}
+#as linhas even ficaram como NA, substitui por 0
+prev[which(is.na(prev))] <- 0
+
+
+
+#save(tabela, lasvegas, siglas, prev, file="lasvegas.rda")

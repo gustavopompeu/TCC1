@@ -1,3 +1,4 @@
+load(file="final.rda")
 teste19 <- final2019[1:1230,]
 
 prev_temp_tree_class <- function(temp_inicio){
@@ -56,5 +57,3 @@ for(j in 2001:2018){
 names(acerto_ano_tree_class) <- 2001:2018
 data.frame(acerto_ano_tree_class)
 #######################
-
-

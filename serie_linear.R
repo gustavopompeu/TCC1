@@ -1,3 +1,4 @@
+load(file="final.rda")
 teste19 <- final2019[1:1230,]
 
 prev_temp <- function(temp_inicio){
@@ -48,16 +49,21 @@ prev_temp <- function(temp_inicio){
 ####################
 acerto_ano_lin <- c()
 for(j in 2001:2018){
-  prev <- prev_temp(j)
-  acerto_ano_lin[(j-2000)] <- mean((prev > 0) == (teste19$result_Vis > 0))
+  prev_lin <- prev_temp(j)
+  acerto_ano_lin[(j-2000)] <- mean((prev_lin > 0) == (teste19$result_Vis > 0))
 }
 names(acerto_ano_lin) <- 2001:2018
 data.frame(acerto_ano_lin)
 ####################
 
-#comparacao dos saldos
-prev_lin <- prev_temp(2007)
+load(file="lasvegas.rda")
+overunder <- which(prev>200)
+prev[overunder] <- NaN
+prev_apostas <- prev
 
-summary(abs(prev_lin - teste19$result_Vis))
-summary(abs(prev_lin - prev_apostas))
+#comparacao dos saldos
+prev_lin2 <- prev_temp(2007)
+
+summary(abs(prev_lin2 - teste19$result_Vis))
+summary(abs(prev_lin2 - prev_apostas))
 summary(abs(prev_apostas - teste19$result_Vis))

@@ -1,3 +1,4 @@
+load(file="final.rda")
 teste19 <- final2019[1:1230,]
 
 prev_temp_log <- function(temp_inicio){
@@ -86,5 +87,3 @@ plot(ult, type="l", xlim=c(0,1230), main="Porcentagem de Acerto das Previsões no
 text(600,.88,"Modelo campeão",cex=1.5)
 abline(h=b[1230], lty=2, col="blue")
 ####################
-
-1-mean(as.logical(prev_log))
