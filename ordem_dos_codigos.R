@@ -1,3 +1,5 @@
+### baixar final.rda, bases.rda, jogos.rda, lasvegas.rda
+
 #1) funcoes.R (Não precisa rodar) : as funções usadas para pegar os dados dos jogos da internet, 
 #e criar as bases de dados usadas no trabalho, e no final a extração das linhas das casas de aposta.
 
