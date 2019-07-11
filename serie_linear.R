@@ -67,3 +67,7 @@ prev_lin2 <- prev_temp(2007)
 summary(abs(prev_lin2 - teste19$result_Vis))
 summary(abs(prev_lin2 - prev_apostas))
 summary(abs(prev_apostas - teste19$result_Vis))
+
+mean((prev_lin2 - teste19$result_Vis)^2)
+mean((prev_apostas - teste19$result_Vis)^2, na.rm = T)
+mean((prev_lin2 - prev_apostas)^2, na.rm = T)
