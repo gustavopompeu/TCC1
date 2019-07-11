@@ -39,8 +39,7 @@ prev_temp_log <- function(temp_inicio){
     td <- td[rowSums(is.na(td)) == 0,]
     a <- glm(Win_Vis~., data = td[,-2], family=binomial(link = "logit"))
     probabilities <- a %>% predict(td19[,-2], type = "response")
-    predicted.classes <- ifelse(probabilities > 0.5, "TRUE", "FALSE")
-    vet <- c(vet,predicted.classes)
+    vet <- c(vet,probabilities)
   }
   
   ord <- match(rownames(teste19), names(vet))
@@ -87,3 +86,28 @@ plot(ult, type="l", xlim=c(0,1230), main="Porcentagem de Acerto das Previsões no
 text(600,.88,"Modelo campeão",cex=1.5)
 abline(h=b[1230], lty=2, col="blue")
 ####################
+
+############# % acerto por faixa de probabilidade de vitória
+prev50 <- prev_log[(prev_log >= 0.4 & prev_log <= 0.6)]
+res50 <- teste19[(prev_log >= 0.4 & prev_log <= 0.6), 1]
+prev60 <- prev_log[(prev_log > 0.6 & prev_log <= 0.7)  | (prev_log < 0.4 & prev_log >= 0.3)]
+res60 <- teste19[(prev_log > 0.6 & prev_log <= 0.7)  | (prev_log < 0.4 & prev_log >= 0.3), 1]
+prev70 <- prev_log[(prev_log > 0.7 & prev_log <= 0.8) | (prev_log < 0.3 & prev_log >= 0.2)]
+res70 <- teste19[(prev_log > 0.7 & prev_log <= 0.8) | (prev_log < 0.3 & prev_log >= 0.2), 1]
+prev80 <- prev_log[(prev_log > 0.8 & prev_log <= 0.9) | (prev_log < 0.2 & prev_log >= 0.1)]
+res80 <- teste19[(prev_log > 0.8 & prev_log <= 0.9) | (prev_log < 0.2 & prev_log >= 0.1), 1]
+prev90 <- prev_log[prev_log > 0.9 | prev_log < 0.1]
+res90 <- teste19[prev_log > 0.9 | prev_log < 0.1, 1]
+
+pred50 <- ifelse(prev50 > 0.5, "TRUE", "FALSE")
+pred60 <- ifelse(prev60 > 0.5, "TRUE", "FALSE")
+pred70 <- ifelse(prev70 > 0.5, "TRUE", "FALSE")
+pred80 <- ifelse(prev80 > 0.5, "TRUE", "FALSE")
+pred90 <- ifelse(prev90 > 0.5, "TRUE", "FALSE")
+
+mean(pred50==res50) #350 obs
+mean(pred60==res60) #331 obs
+mean(pred70==res70) #319 obs
+mean(pred80==res80) #193 obs
+mean(pred90==res90) #37 obs
+
